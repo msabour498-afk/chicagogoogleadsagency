@@ -181,3 +181,166 @@ document.querySelectorAll(".has-menu").forEach((li) => {
     if (!li.contains(e.relatedTarget)) li.querySelector(".sub-toggle")?.setAttribute("aria-expanded", "false");
   });
 });
+
+// ---------------------------------------------------------------
+// Shared: monthly spend → the audit form's spend options
+// ---------------------------------------------------------------
+function spendBucket(n) {
+  if (!n) return "Not running ads yet";
+  if (n < 1000) return "Under $1,000";
+  if (n <= 5000) return "$1,000 to $5,000";
+  if (n <= 20000) return "$5,000 to $20,000";
+  return "More than $20,000";
+}
+const usd = (n, digits = 0) =>
+  "$" + n.toLocaleString("en-US", { minimumFractionDigits: digits, maximumFractionDigits: digits });
+
+// ---------------------------------------------------------------
+// Cost per lead calculator
+// ---------------------------------------------------------------
+(() => {
+  const root = document.getElementById("calc");
+  if (!root) return;
+  const $ = (id) => document.getElementById(id);
+  const num = (id) => {
+    const v = parseFloat($(id).value);
+    return Number.isFinite(v) && v >= 0 ? v : NaN;
+  };
+  const dash = "—";
+
+  function update() {
+    const spend = num("calc-spend"), leads = num("calc-leads");
+    const close = num("calc-close"), value = num("calc-value");
+    const drop = parseInt($("calc-drop").value, 10);
+    $("drop-out").textContent = drop + "%";
+
+    const hasBasics = spend > 0 && leads > 0;
+    const hasClose = hasBasics && close > 0;
+    const hasValue = hasClose && value > 0;
+    const cpl = hasBasics ? spend / leads : NaN;
+    const customers = hasClose ? leads * (close / 100) : NaN;
+    const revenue = hasValue ? customers * value : NaN;
+
+    $("calc-status").textContent = !hasBasics
+      ? "Enter your ad spend and leads"
+      : !hasValue ? "Add close rate and customer value for the rest" : "Based on your numbers";
+    $("out-cpl").textContent = hasBasics ? usd(cpl, cpl < 100 ? 2 : 0) : dash;
+    $("out-cpa").textContent = hasClose ? usd(spend / customers) : dash;
+    $("out-rev").textContent = hasValue ? usd(revenue) + " a month" : dash;
+    $("out-roas").textContent = hasValue ? usd(revenue / spend, 2) + " back for every $1" : dash;
+
+    // What-if: same budget at a lower cost per lead
+    if (hasBasics) {
+      const newLeads = spend / (cpl * (1 - drop / 100));
+      $("wi-leads").textContent = `${Math.round(newLeads)} (+${Math.round(newLeads - leads)})`;
+      const extraCust = hasClose ? (newLeads - leads) * (close / 100) : NaN;
+      $("wi-cust").textContent = hasClose ? (extraCust < 10 ? extraCust.toFixed(1) : Math.round(extraCust)) : dash;
+      $("wi-rev").textContent = hasValue ? usd(extraCust * value) : dash;
+    } else {
+      ["wi-leads", "wi-cust", "wi-rev"].forEach((id) => ($(id).textContent = dash));
+    }
+
+    // Hand the numbers to the audit form
+    const params = new URLSearchParams({ from: "calculator" });
+    if (Number.isFinite(spend)) params.set("spend", spendBucket(spend));
+    if (hasBasics) {
+      const lines = [`From the cost per lead calculator: ${usd(spend)}/month spend, ${leads} leads/month, cost per lead ${usd(cpl, 2)}.`];
+      if (hasClose) lines.push(`About ${close}% of leads become customers.`);
+      if (hasValue) lines.push(`Average customer value ${usd(value)}.`);
+      params.set("msg", lines.join(" "));
+    }
+    $("calc-cta").href = "/audit?" + params.toString();
+  }
+
+  root.addEventListener("input", update);
+  update();
+})();
+
+// ---------------------------------------------------------------
+// Google Ads checkup
+// ---------------------------------------------------------------
+(() => {
+  const form = document.getElementById("checkup-form");
+  if (!form) return;
+  const issues = JSON.parse(document.getElementById("checkup-issues").textContent);
+  const results = document.getElementById("checkup-results");
+  const error = document.getElementById("checkup-error");
+  const keys = [...form.querySelectorAll("fieldset.q")].map((f) => f.dataset.key);
+
+  form.addEventListener("change", () => { error.hidden = true; });
+
+  form.addEventListener("submit", (e) => {
+    e.preventDefault();
+    const answers = Object.fromEntries(keys.map((k) => [k, form.querySelector(`input[name="${k}"]:checked`)?.value]));
+    const missing = keys.filter((k) => !answers[k]);
+    if (missing.length) {
+      error.textContent = missing.length === 1
+        ? "Answer the last question to see your results. \"Not sure\" is a fine answer."
+        : `Answer all ${keys.length} questions to see your results. ${missing.length} still need an answer. "Not sure" is a fine answer.`;
+      error.hidden = false;
+      form.querySelector(`fieldset[data-key="${missing[0]}"] input`).focus();
+      return;
+    }
+
+    const problems = keys.filter((k) => answers[k] !== "yes");
+    const good = keys.length - problems.length;
+    document.getElementById("score-num").textContent = good;
+    const [head, text] =
+      good >= 7 ? ["Your account looks to be in good shape.", "Your setup covers the basics most accounts miss. An audit can still find savings in bidding, ads, and landing pages."]
+      : good >= 4 ? ["There are some leaks worth fixing.", "Your account has a solid start, but these gaps commonly waste budget or hide your real results."]
+      : ["Your account is likely wasting money.", "These are some of the most common and most expensive gaps in Google Ads accounts, and they're usually fixable."];
+    document.getElementById("score-head").textContent = head;
+    document.getElementById("score-text").textContent = text;
+
+    const list = document.getElementById("issue-list");
+    list.innerHTML = "";
+    problems.forEach((k) => {
+      const li = document.createElement("li");
+      const div = document.createElement("div");
+      const strong = document.createElement("strong");
+      strong.textContent = issues[k].title + (answers[k] === "unsure" ? " (you weren't sure)" : "");
+      const span = document.createElement("span");
+      span.textContent = issues[k].text;
+      div.append(strong, span);
+      li.append(div);
+      list.append(li);
+    });
+
+    const params = new URLSearchParams({ from: "checkup" });
+    params.set("msg", problems.length
+      ? `From the Google Ads checkup (${good} of 8 in good shape). Possible issues: ${problems.map((k) => issues[k].title).join("; ")}.`
+      : "From the Google Ads checkup: 8 of 8 in good shape.");
+    document.getElementById("checkup-cta").href = "/audit?" + params.toString();
+
+    form.hidden = true;
+    results.hidden = false;
+    results.focus();
+    results.scrollIntoView({ behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "start" });
+  });
+
+  document.getElementById("checkup-restart").addEventListener("click", () => {
+    form.reset();
+    results.hidden = true;
+    form.hidden = false;
+    form.querySelector("input").focus();
+  });
+})();
+
+// ---------------------------------------------------------------
+// Audit form: prefill from the calculator or checkup
+// ---------------------------------------------------------------
+(() => {
+  const form = document.getElementById("audit-form");
+  if (!form) return;
+  const params = new URLSearchParams(location.search);
+  const spend = params.get("spend"), msg = params.get("msg");
+  const select = form.querySelector("#spend");
+  if (spend && [...select.options].some((o) => o.value === spend || o.text === spend)) select.value = spend;
+  if (msg) form.querySelector("#message").value = msg.slice(0, 1000);
+  if (spend || msg) {
+    const note = document.createElement("p");
+    note.className = "prefill-note";
+    note.textContent = "We've added your results below. Fill in your contact details and send.";
+    form.prepend(note);
+  }
+})();
