@@ -1,4 +1,15 @@
 // ---------------------------------------------------------------
+// Analytics events for Google Tag Manager. These sit in dataLayer and
+// do nothing until a GTM container is added to the pages.
+// Events: generate_lead, text_click, calculator_used, checkup_completed,
+// tool_to_audit
+// ---------------------------------------------------------------
+window.dataLayer = window.dataLayer || [];
+function track(event, params = {}) {
+  window.dataLayer.push({ event, ...params });
+}
+
+// ---------------------------------------------------------------
 // HubSpot connection
 // Both website forms (free audit + contact) send leads to this
 // HubSpot form. Values come from the HubSpot embed code.
@@ -122,6 +133,10 @@ document.querySelectorAll("form[data-form]").forEach((form) => {
     button.textContent = label;
 
     if (result.ok) {
+      track("generate_lead", {
+        form_type: form.dataset.form,
+        lead_source: new URLSearchParams(location.search).get("from") || "direct",
+      });
       form.reset();
       show(
         form.dataset.form === "audit"
@@ -250,6 +265,10 @@ const usd = (n, digits = 0) =>
       params.set("msg", lines.join(" "));
     }
     $("calc-cta").href = "/audit?" + params.toString();
+    if (hasBasics && !root.dataset.tracked) {
+      root.dataset.tracked = "1";
+      track("calculator_used");
+    }
   }
 
   root.addEventListener("input", update);
@@ -311,6 +330,7 @@ const usd = (n, digits = 0) =>
       ? `From the Google Ads checkup (${good} of 8 in good shape). Possible issues: ${problems.map((k) => issues[k].title).join("; ")}.`
       : "From the Google Ads checkup: 8 of 8 in good shape.");
     document.getElementById("checkup-cta").href = "/audit?" + params.toString();
+    track("checkup_completed", { checkup_score: good });
 
     form.hidden = true;
     results.hidden = false;
@@ -344,3 +364,17 @@ const usd = (n, digits = 0) =>
     form.prepend(note);
   }
 })();
+
+// Text-us taps and tool-to-audit clicks
+document.addEventListener("click", (e) => {
+  const a = e.target.closest("a");
+  if (!a) return;
+  const href = a.getAttribute("href") || "";
+  if (href.startsWith("sms:")) {
+    const where = a.closest(".site-header") ? "header" : a.classList.contains("text-fab") ? "floating_button"
+      : a.closest(".site-footer") ? "footer" : "page";
+    track("text_click", { link_location: where });
+  } else if (a.id === "calc-cta" || a.id === "checkup-cta") {
+    track("tool_to_audit", { tool: a.id === "calc-cta" ? "calculator" : "checkup" });
+  }
+});
