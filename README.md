@@ -5,10 +5,12 @@ Static site for Chicago Google Ads Agency. Plain HTML and CSS with no build step
 ## Pages
 
 - `/` home
-- `/services/` overview, plus one page per service: search-ads, performance-max, local-services-ads, youtube-ads, conversion-tracking, reporting
+- `/services` overview, plus one page per service: `/search-ads`, `/performance-max`, `/local-services-ads`, `/youtube-ads`, `/conversion-tracking`, `/reporting`
 - `/audit` free audit request form
 - `/contact`
-- `404.html`, `sitemap.xml`, `robots.txt`, `_headers`
+- `styles.css`, `site.js`, `404.html`, `sitemap.xml`, `robots.txt`, `_headers`
+
+Every file sits at the top level with no folders, so GitHub's drag-and-drop uploader can't scramble the structure.
 
 ## Deploy on Cloudflare Pages
 
@@ -24,7 +26,7 @@ Every push to the main branch redeploys automatically.
 The audit and contact forms need somewhere to send submissions. The simplest option:
 
 1. Create a free form at https://formspree.io and copy its endpoint (looks like `https://formspree.io/f/abcd1234`).
-2. Paste it into `FORM_ENDPOINT` at the top of `assets/site.js`.
+2. Paste it into `FORM_ENDPOINT` at the top of `site.js`.
 
 Until that's set, the forms ask visitors to call (708) 529-1923 instead.
 
