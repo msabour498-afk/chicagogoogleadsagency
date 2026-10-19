@@ -61,9 +61,31 @@ p { margin: 0 0 1em; }
 .site-header .wrap { display: flex; align-items: center; gap: 24px; min-height: 72px; flex-wrap: wrap; }
 .brand { display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--ink); font-weight: 800; font-variation-settings: "wdth" 112; font-size: 1.05rem; line-height: 1.1; }
 .brand svg { width: 30px; height: 30px; flex: none; }
-.nav { display: flex; gap: 22px; margin-left: auto; align-items: center; }
-.nav a { color: var(--ink); text-decoration: none; font-weight: 600; font-size: 0.98rem; }
-.nav a:hover, .nav a[aria-current="page"] { color: var(--red); }
+.nav { margin-left: auto; }
+.nav-list { list-style: none; margin: 0; padding: 0; display: flex; gap: 22px; align-items: center; }
+.nav-list > li > a, .nav-top { color: var(--ink); text-decoration: none; font-weight: 600; font-size: 0.98rem; }
+.nav-list > li > a:hover, .nav-list > li > a[aria-current="page"] { color: var(--red); }
+
+/* Dropdowns */
+.has-menu { position: relative; display: flex; align-items: center; gap: 2px; padding: 22px 0; }
+.sub-toggle { display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; padding: 0; border: 0; border-radius: 4px; background: none; color: var(--ink); cursor: pointer; }
+.sub-toggle svg { width: 12px; height: 12px; transition: transform 0.15s ease; }
+.sub-toggle[aria-expanded="true"] svg { transform: rotate(180deg); }
+.has-menu:hover .sub-toggle, .sub-toggle:hover { color: var(--red); }
+.submenu {
+  display: none; position: absolute; top: 100%; left: -14px; z-index: 30;
+  min-width: 250px; list-style: none; margin: 0; padding: 8px;
+  background: #fff; border: 1px solid var(--line); border-top: 3px solid var(--sky);
+  border-radius: 0 0 var(--radius-sm) var(--radius-sm);
+  box-shadow: 0 16px 32px -18px rgba(19, 35, 58, 0.45);
+}
+.has-menu:hover > .submenu, .sub-toggle[aria-expanded="true"] + .submenu { display: block; }
+.submenu a { display: block; padding: 9px 12px; border-radius: 4px; color: var(--ink); text-decoration: none; font-weight: 500; font-size: 0.97rem; }
+.submenu a:hover, .submenu a:focus-visible { background: var(--sky-pale); color: var(--red); }
+.submenu li:first-child a { font-weight: 700; }
+@media (prefers-reduced-motion: reduce) { .sub-toggle svg { transition: none; } }
+
+.menu-toggle { display: none; font: inherit; font-weight: 700; font-size: 0.95rem; color: var(--ink); background: none; border: 2px solid var(--ink); border-radius: var(--radius-sm); padding: 0.45em 0.9em; cursor: pointer; }
 
 .btn {
   display: inline-flex; align-items: center; justify-content: center; gap: 8px;
@@ -77,10 +99,31 @@ p { margin: 0 0 1em; }
 .btn-line:hover { background: var(--ink); color: #fff; }
 .btn-small { padding: 0.55em 1em; font-size: 0.95rem; }
 
-@media (max-width: 760px) {
-  .site-header .wrap { gap: 10px 16px; padding-top: 12px; padding-bottom: 12px; }
-  .nav { order: 3; width: 100%; margin-left: 0; gap: 18px; overflow-x: auto; }
-  .header-call { margin-left: auto; }
+@media (max-width: 860px) {
+  .site-header .wrap { gap: 10px 12px; padding-top: 12px; padding-bottom: 12px; }
+  .header-call { order: 1; margin-left: auto; }
+  .menu-toggle { display: inline-flex; order: 2; }
+  .nav { display: none; order: 3; width: 100%; margin-left: 0; border-top: 1px solid var(--line); }
+  .nav.open { display: block; }
+  .nav-list { flex-direction: column; align-items: stretch; gap: 0; }
+  .nav-list > li { border-bottom: 1px solid var(--line); }
+  .nav-list > li:last-child { border-bottom: 0; }
+  .nav-list > li > a { display: block; padding: 14px 0; font-size: 1.05rem; }
+  .has-menu { display: block; padding: 0; }
+  .has-menu > .nav-top { display: block; padding: 14px 0 6px; font-size: 1.05rem; }
+  .sub-toggle { display: none; }
+  .submenu, .has-menu:hover > .submenu { display: block; position: static; min-width: 0; padding: 0 0 10px 14px; border: 0; border-left: 3px solid var(--sky); box-shadow: none; border-radius: 0; margin-bottom: 12px; }
+  .submenu li:first-child { display: none; }
+  .submenu a { padding: 7px 10px; }
+}
+@media (max-width: 520px) {
+  .call-num { display: none; }
+}
+@media (max-width: 400px) {
+  .site-header .wrap { gap: 10px 8px; }
+  .brand { font-size: 0.9rem; gap: 8px; }
+  .brand svg { width: 24px; height: 24px; }
+  .header-call, .menu-toggle { padding: 0.45em 0.7em; font-size: 0.9rem; }
 }
 
 /* Flag stripes: the page's signature device */

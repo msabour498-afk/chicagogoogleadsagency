@@ -141,3 +141,43 @@ document.querySelectorAll("form[data-form]").forEach((form) => {
     }
   });
 });
+
+// ---------------------------------------------------------------
+// Navigation: mobile menu button and dropdown menus
+// ---------------------------------------------------------------
+const nav = document.getElementById("main-nav");
+const menuBtn = document.querySelector(".menu-toggle");
+const subToggles = [...document.querySelectorAll(".sub-toggle")];
+
+const closeSubmenus = (except) =>
+  subToggles.forEach((b) => b !== except && b.setAttribute("aria-expanded", "false"));
+
+menuBtn?.addEventListener("click", () => {
+  const open = menuBtn.getAttribute("aria-expanded") !== "true";
+  menuBtn.setAttribute("aria-expanded", String(open));
+  menuBtn.textContent = open ? "Close" : "Menu";
+  nav.classList.toggle("open", open);
+});
+
+subToggles.forEach((btn) => {
+  btn.addEventListener("click", () => {
+    const open = btn.getAttribute("aria-expanded") !== "true";
+    closeSubmenus(btn);
+    btn.setAttribute("aria-expanded", String(open));
+  });
+});
+
+// Close dropdowns on outside click, on Escape, and when focus leaves them.
+document.addEventListener("click", (e) => {
+  if (!e.target.closest(".has-menu")) closeSubmenus();
+});
+document.addEventListener("keydown", (e) => {
+  if (e.key !== "Escape") return;
+  const openBtn = subToggles.find((b) => b.getAttribute("aria-expanded") === "true");
+  if (openBtn) { closeSubmenus(); openBtn.focus(); }
+});
+document.querySelectorAll(".has-menu").forEach((li) => {
+  li.addEventListener("focusout", (e) => {
+    if (!li.contains(e.relatedTarget)) li.querySelector(".sub-toggle")?.setAttribute("aria-expanded", "false");
+  });
+});
