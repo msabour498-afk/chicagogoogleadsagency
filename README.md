@@ -36,6 +36,6 @@ Both forms send leads to HubSpot form `73a341d5-dd4b-4349-b296-095c586914d1` in 
 - Add Google tag / GA4 and conversion tracking for form submissions and `tel:` clicks.
 - Add an email address or office address if you want them shown (also add them to the JSON-LD in each page head).
 
-## HubSpot tracking and chat
+## HubSpot chat
 
-Every page loads the HubSpot tracking code (account 247730807). It links form leads to their browsing history and shows the HubSpot chat widget once chat is turned on in HubSpot.
+The HubSpot tracking/chat script is not on the site. To add chat back, put the HubSpot embed code (`//js-na2.hs-scripts.com/247730807.js`) before `</head>` on every page, and turn the chatflow on in HubSpot.
