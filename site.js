@@ -1,8 +1,8 @@
 // ---------------------------------------------------------------
 // Analytics events for Google Tag Manager. These sit in dataLayer and
 // do nothing until a GTM container is added to the pages.
-// Events: generate_lead, text_click, calculator_used, checkup_completed,
-// tool_to_audit
+// Events: generate_lead, text_click, calculator_used, breakeven_used,
+// checkup_completed, tool_to_audit
 // ---------------------------------------------------------------
 window.dataLayer = window.dataLayer || [];
 function track(event, params = {}) {
@@ -276,6 +276,72 @@ const usd = (n, digits = 0) =>
 })();
 
 // ---------------------------------------------------------------
+// Break-even calculator
+// ---------------------------------------------------------------
+(() => {
+  const root = document.getElementById("be");
+  if (!root) return;
+  const $ = (id) => document.getElementById(id);
+  const num = (id) => {
+    const v = parseFloat($(id).value);
+    return Number.isFinite(v) && v >= 0 ? v : NaN;
+  };
+  const money = (n) => usd(n, n < 100 ? 2 : 0);
+  const dash = "—";
+
+  function update() {
+    const value = num("be-value"), margin = num("be-margin"), close = num("be-close");
+    const click = num("be-click"), current = num("be-current");
+    const keep = parseInt($("be-keep").value, 10);
+    $("be-keep-out").textContent = keep + "%";
+
+    const ready = value > 0 && margin > 0 && close > 0;
+    const hasClick = ready && click > 0;
+    const profit = ready ? value * (margin / 100) : NaN;
+    const maxCpl = ready ? profit * (close / 100) : NaN;
+    const maxCpc = hasClick ? maxCpl * (click / 100) : NaN;
+    const targetCpl = ready ? maxCpl * (1 - keep / 100) : NaN;
+    const targetCpc = hasClick ? maxCpc * (1 - keep / 100) : NaN;
+
+    $("be-status").textContent = ready ? "Based on your numbers" : "Enter value, margin, and close rate";
+    $("be-profit").textContent = ready ? money(profit) : dash;
+    $("be-cpl").textContent = ready ? money(maxCpl) : dash;
+    $("be-cpc").textContent = hasClick ? money(maxCpc) : ready ? "Add clicks that become leads" : dash;
+    $("be-t-cpl").textContent = ready ? money(targetCpl) : dash;
+    $("be-t-cpc").textContent = hasClick ? money(targetCpc) : dash;
+
+    const verdict = $("be-verdict");
+    if (ready && current > 0) {
+      verdict.hidden = false;
+      if (current <= targetCpl) {
+        verdict.className = "verdict good";
+        verdict.textContent = `Your current ${money(current)} per lead is at or under your target. Your ads should be making money.`;
+      } else if (current <= maxCpl) {
+        verdict.className = "verdict warn";
+        verdict.textContent = `Your current ${money(current)} per lead is above your target but under break-even. You're profitable, but keeping less than you want.`;
+      } else {
+        verdict.className = "verdict bad";
+        verdict.textContent = `Your current ${money(current)} per lead is above break-even. At these numbers, your ads cost more than the profit they bring in.`;
+      }
+    } else {
+      verdict.hidden = true;
+    }
+
+    const params = new URLSearchParams({ from: "breakeven" });
+    if (ready) {
+      const lines = [`From the break-even calculator: customer value ${usd(value)}, ${margin}% margin, ${close}% of leads become customers. Break-even cost per lead ${money(maxCpl)}; target ${money(targetCpl)}.`];
+      if (current > 0) lines.push(`Current cost per lead ${money(current)}.`);
+      params.set("msg", lines.join(" "));
+      if (!root.dataset.tracked) { root.dataset.tracked = "1"; track("breakeven_used"); }
+    }
+    $("be-cta").href = "/audit?" + params.toString();
+  }
+
+  root.addEventListener("input", update);
+  update();
+})();
+
+// ---------------------------------------------------------------
 // Google Ads checkup
 // ---------------------------------------------------------------
 (() => {
@@ -374,7 +440,7 @@ document.addEventListener("click", (e) => {
     const where = a.closest(".site-header") ? "header" : a.classList.contains("text-fab") ? "floating_button"
       : a.closest(".site-footer") ? "footer" : "page";
     track("text_click", { link_location: where });
-  } else if (a.id === "calc-cta" || a.id === "checkup-cta") {
-    track("tool_to_audit", { tool: a.id === "calc-cta" ? "calculator" : "checkup" });
+  } else if (["calc-cta", "checkup-cta", "be-cta"].includes(a.id)) {
+    track("tool_to_audit", { tool: { "calc-cta": "calculator", "checkup-cta": "checkup", "be-cta": "breakeven" }[a.id] });
   }
 });
