@@ -83,6 +83,8 @@ p { margin: 0 0 1em; }
 .submenu a { display: block; padding: 9px 12px; border-radius: 4px; color: var(--ink); text-decoration: none; font-weight: 500; font-size: 0.97rem; }
 .submenu a:hover, .submenu a:focus-visible { background: var(--sky-pale); color: var(--red); }
 .submenu li:first-child a { font-weight: 700; }
+.submenu.wide { left: 50%; transform: translateX(-50%); min-width: 500px; columns: 2; column-gap: 8px; }
+.submenu.wide li { break-inside: avoid; }
 @media (prefers-reduced-motion: reduce) { .sub-toggle svg { transition: none; } }
 
 .menu-toggle { display: none; font: inherit; font-weight: 700; font-size: 0.95rem; color: var(--ink); background: none; border: 2px solid var(--ink); border-radius: var(--radius-sm); padding: 0.45em 0.9em; cursor: pointer; }
@@ -114,6 +116,7 @@ p { margin: 0 0 1em; }
   .sub-toggle { display: none; }
   .submenu, .has-menu:hover > .submenu { display: block; position: static; min-width: 0; padding: 0 0 10px 14px; border: 0; border-left: 3px solid var(--sky); box-shadow: none; border-radius: 0; margin-bottom: 12px; }
   .submenu li:first-child { display: none; }
+  .submenu.wide { transform: none; columns: 1; min-width: 0; }
   .submenu a { padding: 7px 10px; }
 }
 @media (max-width: 520px) {

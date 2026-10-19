@@ -5,8 +5,8 @@ Static site for Chicago Google Ads Agency. Plain HTML and CSS with no build step
 ## Pages
 
 - `/` home
-- `/services` overview, plus one page per service: `/search-ads`, `/performance-max`, `/local-services-ads`, `/youtube-ads`, `/conversion-tracking`, `/reporting`
-- `/industries` overview, plus `/personal-injury-lawyers`, `/roofing-contractors`, `/plumbers`, `/hvac`, `/dentists`, `/remodeling-contractors`
+- `/services` overview, plus one page per service, including `/chatgpt-ads` and `/google-ads-account-help`
+- `/industries` overview, plus one page per industry (personal injury, criminal defense, family law, roofing, plumbing, HVAC, dentists, remodeling, water damage restoration, basement waterproofing, med spas)
 - `/audit` free audit request form
 - `/contact`
 - `styles.css`, `site.js`, `404.html`, `sitemap.xml`, `robots.txt`, `_headers`
