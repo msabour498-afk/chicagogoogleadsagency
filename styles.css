@@ -302,3 +302,16 @@ p { margin: 0 0 1em; }
   .text-fab .fab-long { display: none; }
   .text-fab .fab-short { display: inline; }
 }
+
+/* Track record */
+.proof { list-style: none; padding: 0; margin: 36px 0 0; display: grid; grid-template-columns: repeat(3, auto); justify-content: start; border-top: 1px solid var(--line); }
+.proof li { padding: 16px 22px 0; border-left: 1px solid var(--line); }
+.proof li:first-child { padding-left: 0; border-left: 0; }
+.proof b { display: block; font-weight: 800; font-variation-settings: "wdth" 112; font-size: 1.4rem; line-height: 1.1; color: var(--ink); white-space: nowrap; }
+.proof span { display: block; color: var(--muted); font-size: 0.92rem; margin-top: 4px; white-space: nowrap; }
+@media (max-width: 520px) {
+  .proof { grid-template-columns: 1fr; }
+  .proof li { border-left: 0; padding: 14px 0 0; }
+}
+.hero-proof { margin: 20px 0 0; font-weight: 600; font-size: 0.95rem; color: var(--muted); }
+.cta-proof { margin: 12px 0 0; font-weight: 600; color: var(--muted); }
