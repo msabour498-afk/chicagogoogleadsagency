@@ -134,10 +134,10 @@ document.querySelectorAll("form[data-form]").forEach((form) => {
 
     const types = result.errors.map((x) => x.errorType);
     if (types.includes("INVALID_EMAIL") || types.includes("BLOCKED_EMAIL")) {
-      show("That email address was rejected. Check it for typos, or call us at " + PHONE + ".", "err");
+      show("That email address was rejected. Check it for typos, or text us at " + PHONE + ".", "err");
       email?.focus();
     } else {
-      show(`That didn't go through. Try again, or call us at ${PHONE}.`, "err");
+      show(`That didn't go through. Try again, or text us at ${PHONE}.`, "err");
     }
   });
 });
