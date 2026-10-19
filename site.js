@@ -59,10 +59,12 @@ function buildFields(form) {
 }
 
 async function submitToHubSpot(fields) {
-  const body = JSON.stringify({
-    fields,
-    context: { pageUri: location.href, pageName: document.title },
-  });
+  // Links the lead to the visitor's HubSpot browsing history, when the
+  // HubSpot tracking code has set its cookie.
+  const hutk = document.cookie.match(/(?:^|; )hubspotutk=([^;]+)/)?.[1];
+  const context = { pageUri: location.href, pageName: document.title };
+  if (hutk) context.hutk = hutk;
+  const body = JSON.stringify({ fields, context });
   let last;
   for (const host of HUBSPOT_HOSTS) {
     try {

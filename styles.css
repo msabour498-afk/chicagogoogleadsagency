@@ -212,10 +212,30 @@ p { margin: 0 0 1em; }
 .site-footer { background: var(--ink); color: #C9D6E3; padding: 56px 0 32px; font-size: 0.98rem; }
 .site-footer a { color: #fff; text-decoration: none; }
 .site-footer a:hover { text-decoration: underline; }
-.footer-grid { display: grid; grid-template-columns: 1.4fr 1fr 1fr; gap: 32px; }
+.footer-grid { display: grid; grid-template-columns: 1.4fr 1fr 1fr 1fr; gap: 32px; }
 .footer-grid h3 { color: #fff; font-size: 1rem; margin-bottom: 12px; }
 .footer-grid ul { list-style: none; padding: 0; margin: 0; display: grid; gap: 8px; }
 .footer-brand { display: flex; gap: 10px; align-items: center; color: #fff; font-weight: 800; font-variation-settings: "wdth" 112; margin-bottom: 12px; }
 .footer-brand svg { width: 26px; height: 26px; }
 .footer-bottom { border-top: 1px solid #2A3D57; margin-top: 40px; padding-top: 20px; font-size: 0.9rem; }
-@media (max-width: 760px) { .footer-grid { grid-template-columns: 1fr; } }
+@media (max-width: 960px) { .footer-grid { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 560px) { .footer-grid { grid-template-columns: 1fr; } }
+
+/* Industry links on the homepage */
+.ind-links { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(3, 1fr); border-top: 2px solid var(--ink); }
+.ind-links li { border-bottom: 1px solid var(--line); }
+.ind-links a { display: flex; align-items: center; gap: 12px; padding: 18px 0; font-weight: 700; font-size: 1.1rem; color: var(--ink); text-decoration: none; }
+.ind-links a::before {
+  content: ""; width: 16px; height: 16px; flex: none; background: var(--red);
+  clip-path: polygon(50% 0%, 61.5% 30.1%, 93.3% 25%, 73% 50%, 93.3% 75%, 61.5% 69.9%, 50% 100%, 38.5% 69.9%, 6.7% 75%, 27% 50%, 6.7% 25%, 38.5% 30.1%);
+}
+.ind-links a:hover { color: var(--red); }
+@media (max-width: 860px) { .ind-links { grid-template-columns: 1fr 1fr; column-gap: 24px; } }
+@media (max-width: 520px) { .ind-links { grid-template-columns: 1fr; } }
+
+/* "What we set up" list on industry pages */
+.run-list { padding: 0; border-top: 2px solid var(--ink); border-radius: 0; }
+.run-list .report-row { grid-template-columns: 180px 1fr; }
+.run-list a { color: var(--ink); }
+.run-list a:hover { color: var(--red); }
+@media (max-width: 560px) { .run-list .report-row { grid-template-columns: 1fr; } }
