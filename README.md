@@ -34,7 +34,7 @@ Both forms send leads to HubSpot form `73a341d5-dd4b-4349-b296-095c586914d1` in 
 
 - FAQ answers on the home page match how you actually run audits.
 - Add Google tag / GA4 and conversion tracking for form submissions and `tel:` clicks.
-- Add an email address or office address if you want them shown (also add them to the JSON-LD in each page head).
+- Office address (229 W Madison St, Chicago, IL 60606) is in every page's footer, the contact page, and the JSON-LD. Keep it identical to the Google Business Profile listing.
 
 ## HubSpot chat
 
