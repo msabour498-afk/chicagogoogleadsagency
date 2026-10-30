@@ -201,11 +201,10 @@ document.querySelectorAll(".has-menu").forEach((li) => {
 // Shared: monthly spend → the audit form's spend options
 // ---------------------------------------------------------------
 function spendBucket(n) {
-  if (!n) return "Not running ads yet";
-  if (n < 1000) return "Under $1,000";
-  if (n <= 5000) return "$1,000 to $5,000";
-  if (n <= 20000) return "$5,000 to $20,000";
-  return "More than $20,000";
+  if (!n || n < 10000) return "";
+  if (n <= 50000) return "$10,000 to $50,000";
+  if (n <= 100000) return "$50,000 to $100,000";
+  return "More than $100,000";
 }
 const usd = (n, digits = 0) =>
   "$" + n.toLocaleString("en-US", { minimumFractionDigits: digits, maximumFractionDigits: digits });
@@ -257,7 +256,7 @@ const usd = (n, digits = 0) =>
 
     // Hand the numbers to the audit form
     const params = new URLSearchParams({ from: "calculator" });
-    if (Number.isFinite(spend)) params.set("spend", spendBucket(spend));
+    if (Number.isFinite(spend) && spendBucket(spend)) params.set("spend", spendBucket(spend));
     if (hasBasics) {
       const lines = [`From the cost per lead calculator: ${usd(spend)}/month spend, ${leads} leads/month, cost per lead ${usd(cpl, 2)}.`];
       if (hasClose) lines.push(`About ${close}% of leads become customers.`);
