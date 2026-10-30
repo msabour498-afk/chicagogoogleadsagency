@@ -201,7 +201,8 @@ document.querySelectorAll(".has-menu").forEach((li) => {
 // Shared: monthly spend → the audit form's spend options
 // ---------------------------------------------------------------
 function spendBucket(n) {
-  if (!n || n < 50000) return "";
+  if (!n || n < 30000) return "";
+  if (n <= 50000) return "$30,000 to $50,000";
   if (n <= 100000) return "$50,000 to $100,000";
   return "More than $100,000";
 }
